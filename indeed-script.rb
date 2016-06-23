@@ -16,6 +16,7 @@ def initial_search(query,location)
 end
 
 def close_modal
+  return if @driver.find_elements(:id, 'prime-popover-x').empty?
   pop = @driver.find_element(:id, 'prime-popover-x')
   pop.click if pop #for modal, need to find if modal is displaying instead if this breaks load
 end
@@ -176,9 +177,9 @@ end
 def add_jobs
 
   puts "Job search"
-  @query = gets.chomp
+  query = gets.chomp
   puts "location search"
-  @location = gets.chomp
+  location = gets.chomp
 
   @driver = Selenium::WebDriver.for:chrome
   @driver.navigate.to "http://www.indeed.com"
@@ -187,7 +188,7 @@ def add_jobs
   job_ids_already_in_queue = return_all_job_ids_in_queue("./jobs.csv")
   count = 10
 
-  initial_search
+  initial_search(query,location)
   close_modal
 
   base_uri = @driver.current_url
