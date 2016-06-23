@@ -5,23 +5,16 @@ require 'nokogiri'
 
 
 def print_cover_letter(el)
-  return "Dear Hiring Manager,
-
-With my skill set and experience, I believe I would make a great addition to the #{el[3]} team. I have experience with multiple web technologies, including Ruby on Rails, Javascript, HTML5, CSS3, React.js, PostgreSQL, responsive frameworks like Bootstrap and Skeleton, and behavior driven development frameworks like Jasmine and RSpec. I have built a number of passion projects using these technologies, including CitiBike Map, a live station feed map of New York City CitiBike locations. The app was built using Ruby on Rails, a vanilla Javascript MVC frontend, and the Google Maps API.
-
-Whether it’s a team project or my personal website (www.tomyancey.me) , I always insist on a high level of quality and stability.
-
-For all of the reasons above, I believe I would make a great addition to your team. I have attached my resume for your consideration and look forward to hearing from you.
-
-Best Regards,
-Thomas Yancey"
+  return "COVER_LETTER_HERE"
 end
 
 def cover_letter_to_clipboard(el)
+  #saves cover letter filepath to clipboard
   `echo "#{print_cover_letter(el)}" | pbcopy`
 end
 
 def file_path_to_clipboard(el)
+  #saves cover letter to clipboard
   `echo "/Users/thomasyancey/Desktop/indeed-apply/cover_letters/#{el[0]}" | pbcopy`
 end
 
