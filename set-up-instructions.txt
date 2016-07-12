@@ -6,3 +6,8 @@ l# - www.linkedin.com/in/tomyancey
 
 google manage auto-fill form in chrome advanced settings
 fill out address info
+
+
+
+@driver.switch_to.frame(@driver.find_elements(tag_name: 'iframe')[-1])
+app = @driver.find_element(id: "applicant.applicationMessage")

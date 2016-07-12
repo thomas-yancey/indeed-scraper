@@ -32,16 +32,20 @@ def loop_through_jobs(arr)
 #     next if el[0] != "p_388abe5fd14f2f6a" #id
 #     next if el[3] != "Real Life Sciences"
     # next if el[5] != "false" # easy_apply
-    next if el[6] == "30 days ago" || el[6] == "30+ days ago"
+        puts i
+    # next if !el[1].downcase.match(/ruby|junior|jr|rails|stack/)
+    # next if el[6] == "30 days ago" || el[6] == "30+ days ago"
     # next if el[7] != "frontend developer" #Job search
     # # next if el[8] != "Phoenix az" # #search location
 
-    next if el[9] == "true" #for viewed
-    next if el[10] == "true" #for applied
+    next if el[9] == "true" || el[9] == "TRUE" #for viewed
+    next if el[10] == "true" || el[10] == "TRUE" #for applied
+    next if el[-2] == "true" || el[-2] == "TRUE" #skip
+
 
     cover_letter_to_clipboard(el)
-    %x{ open cover_letters/#{el[0]} }
-    rescue_if_window_is_closed(el)
+    # %x{ open cover_letters/#{el[0]} }
+    navigate_with_rescue_if_closed(el)
 
     input = user_applied_response(el)
     break if input == "done"
@@ -60,7 +64,19 @@ def run_program
   done = false
 
   @driver = Selenium::WebDriver.for:chrome
-  loop_through_jobs(arr)
+
+  selection = ""
+  until selection == "all" || selection == "easy"
+    puts "all or easy"
+    selection = gets.chomp
+  end
+
+  if selection == "all"
+    loop_through_jobs(arr)
+  else
+    easy_apply_run(arr)
+  end
+
   @driver.quit
 
   CSV.open("out.csv", 'w') do |csv|
@@ -76,7 +92,7 @@ def indeed_apply
 
 
   apply_now_button[0].click
-  last_frame = @driver.find_elements(tag_name: 'iframe')[-1]
+
 end
 
 
@@ -134,13 +150,39 @@ def personal_site_fill
   @driver.find_elements(:name, "portfolio")[0].send_keys("www.tomyancey.me") if @driver.find_elements(:name, "portfolio").any?
 end
 
-def rescue_if_window_is_closed(el)
+def navigate_with_rescue_if_closed(el)
   begin
     @driver.navigate.to("http://www.indeed.com" + el[2])
   rescue
     @driver = Selenium::WebDriver.for:chrome
     @driver.navigate.to("http://www.indeed.com" + el[2])
   end
+end
+
+def easy_apply_navigate(el)
+  sub_url = ""
+
+  if el[2].match(/\/cmp/) || el[2].include?("pagead")
+    sub_url = el[2]
+  else
+    sub_portion = el[2].match(/jk=(.*)/)[1]
+
+    if sub_portion.include?("=")
+      sub_portion = sub_portion.split("=")[0]
+    end
+
+    sub_url = "/viewjob?jk=" + sub_portion
+  end
+
+  begin
+    @driver.navigate.to("http://www.indeed.com" + sub_url)
+  rescue
+    @driver = Selenium::WebDriver.for:chrome
+    @driver.navigate.to("http://www.indeed.com" + sub_url)
+  end
+end
+
+def get_job_id
 end
 
 def lever_fill
@@ -154,7 +196,92 @@ def lever_fill
   personal_site_fill
 end
 
+def apply_click
+  begin
+    @driver.find_element(id: "apply").click
+  rescue
+    return false
+  end
+  true
+end
+
+def continue_click
+  begin
+    @driver.find_elements(css: "a.button_content.form-page-next")[0].click
+  rescue
+    return false
+  end
+  true
+end
+
+def has_class_element(el)
+end
+
+def has_id_element(el)
+end
+
+def easy_apply_run(arr)
+    arr[1..-1].each_with_index do |el,i|
+    index = i + 1
+    puts i
+    next if el[5] == "false" || el[5] == "FALSE"
+    next if el[10] == "true" || el[10] == "TRUE" #for applied
+    cover_letter_to_clipboard(el)
+    puts "here"
+    easy_apply_navigate(el)
+    sleep 1
+    input = ""
+    if @driver.find_elements(class: "indeed-apply-button-inner").length > 0
+      indeed_apply
+      sleep 2
+      @driver.switch_to.frame(@driver.find_elements(tag_name: 'iframe')[-1])
+      @driver.switch_to.frame(0)
+
+      if @driver.find_elements(id: "applicant.name").length > 0
+        @driver.find_element(id: "applicant.name").send_keys("Thomas Yancey")
+      end
+
+      if @driver.find_elements(id: "applicant.firstName").length > 0
+        @driver.find_element(id: "applicant.firstName").send_keys("Thomas")
+      end
+
+      if @driver.find_elements(id: "applicant.lastName").length > 0
+        @driver.find_element(id: "applicant.lastName").send_keys("Yancey")
+      end
+
+      if @driver.find_elements(id: "applicant.email").length > 0
+        @driver.find_element(id: "applicant.email").send_keys("tomyancey1@gmail.com")
+      end
+
+      if @driver.find_elements(id: "applicant.phoneNumber").length > 0
+        @driver.find_element(id: "applicant.phoneNumber").send_keys("(703) 785-4210")
+      end
+
+      @driver.find_element(id: "resume").send_keys("/Users/thomasyancey/Desktop/indeed-apply/Thomas_Yancey_ Resume.pdf")
+      cover_letter_element = @driver.find_element(id: "applicant.applicationMessage")
+      cover_letter_element.send_keys(print_cover_letter(el))
+      sleep 1
+      binding.pry
+      if apply_click
+        puts "apply click"
+        input = "y"
+      else
+        puts "continue click"
+        # continue_click
+      end
+    end
+
+    unless input == "y"
+      input = user_applied_response(el)
+    end
+
+    break if input == "done"
+    arr[index][9] = "true"
+    arr[index][10] = input == "y" ? "true" : "false"
+    arr[index][11] = Time.now.strftime("%d/%m/%Y %H:%M") if input == "y"
+
+  end
+
+end
+
 run_program
-
-
-
