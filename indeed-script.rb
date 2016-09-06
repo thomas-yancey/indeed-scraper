@@ -164,7 +164,9 @@ def grab_all_fields_from_div(div)
     arr << grab_location_loop(div)
     arr << grab_easy_apply_loop(div)
     arr << grab_age_loop(div)
-    arr.push(@query,@location, "false")
+    arr << @query
+    arr << @location
+    arr << "false"
     arr
 end
 
@@ -177,14 +179,14 @@ end
 def add_jobs
 
   puts "Job search"
-  query = gets.chomp
+  @query = gets.chomp
   puts "location search"
-  location = gets.chomp
+  @location = gets.chomp
 
   @driver = Selenium::WebDriver.for:chrome
   @driver.navigate.to "http://www.indeed.com"
 
-  f = CSV.open("./jobs.csv", "a+")
+  csv_file = CSV.open("./jobs.csv", "a+")
   job_ids_already_in_queue = return_all_job_ids_in_queue("./jobs.csv")
   count = 10
 
@@ -193,7 +195,7 @@ def add_jobs
 
   base_uri = @driver.current_url
 
-  until count == 1000
+  until count >= 500
 
     doc = Nokogiri::HTML(@driver.page_source)
     pagination = doc.css("div").find {|div| div.attr('class') == "pagination" }
@@ -203,7 +205,7 @@ def add_jobs
       div_data = grab_all_fields_from_div(div)
 
       unless job_ids_already_in_queue.include?(div_data[0])
-        f << div_data
+        csv_file << div_data
         job_ids_already_in_queue << div_data[0]
       end
     end
@@ -212,22 +214,11 @@ def add_jobs
     @driver.navigate.to(base_uri + "&start=#{count}" )
     count += 10
   end
-  f.close
+  csv_file.close
 end
 
 
 add_jobs
-#Get title right, and get dates old
-
-#seperate and put into csv files based upon easy apply or not
-#div id is the job id, so do not place duplicates
-#get pagination working to collect all jobs
-#figure out submit as quickly as possible
-#switch xxxx out for company name in cover letter
-#after submit move to submitted csv and remove from jobs csv
-#check submitted and queue csvs for jobs before adding
-
 
 
 @driver.quit
-
