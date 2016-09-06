@@ -61,6 +61,13 @@ end
 
 def run_program
   arr = CSV.table("jobs.csv").to_a
+
+  # receiving a "undefined method encode for nil" error? replace above line with:
+
+  # arr = CSV.read( "jobs.csv", { headers:           false,
+  #               converters:        :numeric,
+  #               header_converters: :symbol } ).to_a
+
   done = false
 
   @driver = Selenium::WebDriver.for:chrome
