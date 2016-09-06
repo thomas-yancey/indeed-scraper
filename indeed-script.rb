@@ -1,6 +1,6 @@
 require 'selenium-webdriver'
 require 'nokogiri'
-require 'pry'
+# require 'pry'
 require 'csv'
 
 def initial_search(query,location)
@@ -230,4 +230,3 @@ add_jobs
 
 
 @driver.quit
-
