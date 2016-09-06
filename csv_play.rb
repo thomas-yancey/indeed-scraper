@@ -194,7 +194,6 @@ def save_and_reopen_csv_file(arr)
 end
 
 def click_through_apply_frame
-  if @driver.find_elements(class: "indeed-apply-button-inner").length > 0
 
     indeed_apply
     sleep 2
@@ -223,7 +222,7 @@ def click_through_apply_frame
       @input = "y"
       sleep 0.5
     end
-  end
+
 end
 
 def easy_apply_run(arr)
@@ -243,21 +242,24 @@ def easy_apply_run(arr)
     sleep 1
     @input = ""
 
-    click_through_apply_frame
+    if @driver.find_elements(class: "indeed-apply-button-inner").length > 0
+      click_through_apply_frame
+    elsif @driver.find_elements(class: "view-apply-button").length > 0
+      @input = "n"
+    end
+
 
     unless @input == "y" || @input == "n"
-      input = user_applied_response(el)
+      @input = user_applied_response(el)
     end
 
     break if @input == "done"
     arr[index][8] = "true"
     arr[index][9] = @input == "y" ? "true" : "false"
-    arr[index][10] = Time.now.strftime("%d/%m/%Y %H:%M") if input == "y"
+    arr[index][10] = Time.now.strftime("%d/%m/%Y %H:%M") if @input == "y"
     arr[index][11] = "true" if @input == "d"
     #needs manual input
-    arr[index][12] = @input == "y" ? "false" : "true"
-    arr = save_and_reopen_csv_file(arr)
-
+    arr[index][12] = @input == "n" ? "true" : "false"
   end
 
 end

@@ -3,14 +3,14 @@ require 'nokogiri'
 require 'pry'
 require 'csv'
 
-def initial_search(query,location)
+def initial_search
 
   what_element = @driver.find_element(:name, 'q')
-  what_element.send_keys(query)
+  what_element.send_keys(@query)
 
   where_element = @driver.find_element(:name, 'l')
   where_element.clear
-  where_element.send_keys(location)
+  where_element.send_keys(@location)
 
   what_element.submit
 end
@@ -167,6 +167,8 @@ def grab_all_fields_from_div(div)
     arr << @query
     arr << @location
     arr << "false"
+    arr << nil
+    arr << "false"
     arr
 end
 
@@ -190,7 +192,7 @@ def add_jobs
   job_ids_already_in_queue = return_all_job_ids_in_queue("./jobs.csv")
   count = 10
 
-  initial_search(query,location)
+  initial_search
   close_modal
 
   base_uri = @driver.current_url
