@@ -5,6 +5,7 @@ require 'nokogiri'
 
 
 def print_cover_letter(el)
+
   return "To Whom it may concern,
 
 With my skill set and experience, I believe I would make a great addition to the #{el[3]} team. I have experience with multiple web technologies, including Ruby on Rails, Javascript, React.js, PostgreSQL, responsive frameworks like Bootstrap and Semantic UI, and behavior driven development frameworks like Jasmine and RSpec. I have built a number of passion projects using these technologies, including www.brokeflix.com, a free streaming movie aggregator that makes it easy to find quality free movies online. The app was built using Ruby on Rails 5 api mode backend, and a React.js frontend configured with Webpack.
@@ -16,6 +17,7 @@ For all of the reasons above, I believe I would make a great addition to your te
 Best Regards,
 Thomas Yancey"
 end
+
 
 def recruiter_letter
   return "To Whom it may concern,
@@ -46,12 +48,23 @@ def loop_through_jobs(arr)
   arr[1..-1].each_with_index do |el,i|
     index = i + 1
 
+#     next if el[0] != "p_388abe5fd14f2f6a" #id
+#     next if el[3] != "Real Life Sciences"
+    # next if el[5] != "false" # easy_apply
+        puts i
+    # next if !el[1].downcase.match(/ruby|junior|jr|rails|stack/)
+    # next if el[6] == "30 days ago" || el[6] == "30+ days ago"
+    # next if el[7] != "frontend developer" #Job search
+    # # next if el[8] != "Phoenix az" # #search location
+
     next if el[9] == "true" || el[9] == "TRUE" #for viewed
     next if el[10] == "true" || el[10] == "TRUE" #for applied
     next if el[-2] == "true" || el[-2] == "TRUE" #skip
 
+
     cover_letter_to_clipboard(el)
 
+    # %x{ open cover_letters/#{el[0]} }
     navigate_with_rescue_if_closed(el)
 
     input = user_applied_response(el)
@@ -68,6 +81,14 @@ end
 
 def run_program
   arr = CSV.table("jobs.csv").to_a
+
+  # receiving a "undefined method encode for nil" error? replace above line with:
+
+  # arr = CSV.read( "jobs.csv", { headers:           false,
+  #               converters:        :numeric,
+  #               header_converters: :symbol } ).to_a
+
+
   done = false
 
   @driver = Selenium::WebDriver.for:chrome
@@ -112,6 +133,9 @@ def user_applied_response(el)
 
     binding.pry if input == "pry"
 
+  until input == "y" || input == "n" || input == "done"
+    binding.pry if input == "pry"
+
     if input == "f"
       file_path_to_clipboard(el)
       puts "copied filepath to clipboard"
@@ -148,13 +172,16 @@ end
 
 def easy_apply_navigate(el)
   sub_url = ""
+
   if el[2].match(/\/cmp/) || el[2].include?("pagead")
     sub_url = el[2]
   else
     sub_portion = el[2].match(/jk=(.*)/)[1]
+
     if sub_portion.include?("=")
       sub_portion = sub_portion.match(/.*\&/)[0].chop
     end
+
     sub_url = "/viewjob?jk=" + sub_portion
   end
 
@@ -164,6 +191,20 @@ def easy_apply_navigate(el)
     @driver = Selenium::WebDriver.for:chrome
     @driver.navigate.to("http://www.indeed.com" + sub_url)
   end
+end
+
+def get_job_id
+end
+
+def lever_fill
+  first_name_fill
+  last_name_fill
+  full_name_fill
+  email_fill
+  phone_fill
+  linkedin_fill
+  github_fill
+  personal_site_fill
 end
 
 def apply_click
@@ -236,10 +277,19 @@ def easy_apply_run(arr)
     next if el[9] == "true" || el[9] == "TRUE" #for applied
     next if el[11] == "true" || el[11] == "TRUE" #for skipped
     next if el[12] == "true" || el[12] == "TRUE"
+
+def easy_apply_run(arr)
+    arr[1..-1].each_with_index do |el,i|
+    index = i + 1
+    puts i
+    next if el[5] == "false" || el[5] == "FALSE"
+    next if el[10] == "true" || el[10] == "TRUE" #for applied
+
     cover_letter_to_clipboard(el)
     puts "here"
     easy_apply_navigate(el)
     sleep 1
+
     @input = ""
 
     if @driver.find_elements(class: "indeed-apply-button-inner").length > 0
@@ -260,6 +310,7 @@ def easy_apply_run(arr)
     arr[index][11] = "true" if @input == "d"
     #needs manual input
     arr[index][12] = @input == "n" ? "true" : "false"
+
   end
 
 end
