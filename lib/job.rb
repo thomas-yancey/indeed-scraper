@@ -63,7 +63,7 @@ class Job
       @driver = Selenium::WebDriver.for:chrome
       @driver.navigate.to("http://www.indeed.com" + new_sub_url)
     end
-    sleep 4
+    sleep 1
   end
 
   def click_through_apply_frame
@@ -140,7 +140,6 @@ class Job
   end
 
   def set_semi_applied_status(input)
-
     if input == "y"
       @applied = 'true'
       @applied_date = Time.now.strftime("%d/%m/%Y %H:%M")
@@ -158,7 +157,7 @@ class Job
     until input == "y" || input == "n"
       user_input_applied
     end
-
+    input
   end
 
 

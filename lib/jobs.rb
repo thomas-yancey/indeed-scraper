@@ -25,23 +25,18 @@ class Jobs
   end
 
   def apply_easy_jobs
-    applied_count = 0
+
 
     self.jobs_array.each_with_index do |job, idx|
-
-      puts "#{job.id} #{job.easy_apply?} #{job.not_yet_applied?} #{!job.needs_manual?}"
 
       result = job.to_array
 
       if job.easy_apply? && job.not_yet_applied? && !job.needs_manual?
         result = job.easily_apply
-        if result[-1] == "false"
-          applied_count += 1
-        end
+        p "#{jobs_array.length} #{idx}"
       end
 
       p result
-      puts "applied_count #{applied_count}"
       @new_jobs_array <<  result
       self.add_result_to_backup_csv(result)
 
@@ -52,7 +47,7 @@ class Jobs
   end
 
   def mostly_easy_apply_jobs
-    applied_count = 0
+
     continue = true
 
     self.jobs_array.each_with_index do |job, idx|
@@ -62,12 +57,13 @@ class Jobs
       result = job.to_array
 
       if job.easy_apply? && job.not_yet_applied? && job.needs_manual?
-        job.start_form
+        result = job.start_form
         continue = continue_input
       end
 
       p result
-      puts "applied_count #{applied_count}"
+      p "#{idx} #{self.jobs_array.length}"
+
       self.jobs_array[idx] =  result
       self.add_result_to_backup_csv(result)
     end
