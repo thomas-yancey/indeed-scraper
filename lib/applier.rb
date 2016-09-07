@@ -14,10 +14,13 @@ class Applier
   end
 
   def easy_apply_run
-    # login_to_indeed
-    puts 'here'
-    sleep 1
+    login_to_indeed
     self.jobs.apply_easy_jobs
+  end
+
+  def mostly_easy_apply_run
+    login_to_indeed
+    self.jobs.mostly_easy_apply_jobs
   end
 
   def login_to_indeed
@@ -29,7 +32,5 @@ class Applier
     @driver.find_element(id: "signin_email").send_keys(ENV["INDEED_EMAIL"])
     sleep 4
   end
-
-
 
 end
