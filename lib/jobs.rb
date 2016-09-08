@@ -102,4 +102,25 @@ class Jobs
     `mv out.csv jobs.csv`
   end
 
+  def update_all_ages_to_numeric
+    @jobs_array.each_with_index do |job|
+      job.change_age_to_numeric
+    end
+  end
+
+  def update_age_sort_and_replace
+    self.update_all_ages_to_numeric
+    self.sort_by_age
+    self.replace_jobs_array_with_arrays
+    self.replace_contents_of_jobs_csv
+  end
+
+  def sort_by_age
+    @jobs_array.sort_by! {|job| job.age.to_i }
+  end
+
+  def replace_jobs_array_with_arrays
+    @jobs_array.each_with_index {|job,idx| @jobs_array[idx] = job.to_array }
+  end
+
 end

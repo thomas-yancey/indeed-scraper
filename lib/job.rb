@@ -172,5 +172,25 @@ class Job
     self.to_array
   end
 
+  def change_age_to_numeric
+
+    return @age if @age.is_a?(Fixnum)
+
+    @age = 0 if @age.match(/hours/)
+    @age = 31 if @age == "30+ days ago"
+
+    return @age if @age.is_a?(Fixnum)
+
+    num_match = @age.match(/[0-9]+/)[0] if !!@age.match(/[0-9]+/)
+
+    if num_match
+      @age = num_match.to_i
+    end
+
+    @age
+
+  end
+
+
 
 end

@@ -33,4 +33,8 @@ class Applier
     sleep 4
   end
 
+  def update_ages_and_sort
+    @jobs.update_age_sort_and_replace
+  end
+
 end
