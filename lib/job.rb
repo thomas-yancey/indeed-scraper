@@ -4,7 +4,9 @@ class Job
 
   include Personal
 
-  attr_accessor :id, :title, :sub_url, :company, :location, :easy_apply, :age, :viewed, :applied, :applied_date, :query_location, :needs_manual, :applied_status, :already_applied, :choose_not_to_apply
+  attr_accessor :id, :title, :sub_url, :company, :location, :easy_apply, :age,
+  :viewed, :applied, :applied_date, :query_location, :needs_manual, :applied_status,
+  :already_applied, :choose_not_to_apply, :new_sub_url
 
   def initialize(params={})
     @driver = params[:driver]
@@ -22,6 +24,7 @@ class Job
     @needs_manual = params[:job_data][11]
     @applied_status = false
     @already_applied = false
+    @new_sub_url = nil
     @choose_not_to_apply = params[:job_data][12] || nil
   end
 
@@ -44,26 +47,29 @@ class Job
     @needs_manual == 'true'
   end
 
-  def easy_apply_navigate
+  def get_sub_url
     puts @id.class
-    new_sub_url = ""
     if @sub_url.match(/\/cmp/) || @sub_url.include?("pagead")
-      new_sub_url = @sub_url
+      @new_sub_url = @sub_url
     else
-      new_sub_url = @sub_url.match(/jk=(.*)/)[1]
-      if new_sub_url.include?("=")
-        new_sub_url = new_sub_url.match(/.*\&/)[0].chop
+      new_sub_url = @sub_url.match(/jk=(.*)/)[1] rescue nil
+      if new_sub_url
+        if new_sub_url.include?("=")
+          new_sub_url = new_sub_url.match(/.*\&/)[0].chop
+        end
+        @new_sub_url = "/viewjob?jk=" + new_sub_url
       end
-      new_sub_url = "/viewjob?jk=" + new_sub_url
     end
+    @new_sub_ul
+  end
 
+  def easy_apply_navigate
     begin
       @driver.navigate.to("http://www.indeed.com" + new_sub_url)
     rescue
       @driver = Selenium::WebDriver.for:chrome
       @driver.navigate.to("http://www.indeed.com" + new_sub_url)
     end
-    sleep 1
   end
 
   def click_through_apply_frame

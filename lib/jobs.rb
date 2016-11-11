@@ -32,7 +32,10 @@ class Jobs
       result = job.to_array
 
       if job.easy_apply? && job.not_yet_applied? && !job.needs_manual?
-        result = job.easily_apply
+        job.get_sub_url
+        if job.new_sub_url
+          result = job.easily_apply
+        end
         p "#{jobs_array.length} #{idx}"
       end
 
