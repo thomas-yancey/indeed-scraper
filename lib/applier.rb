@@ -28,9 +28,7 @@ class Applier
     sleep 1
     @driver.find_elements(id: "userOptionsLabel")[0].click
     sleep 1
-    @driver.find_element(id: "signin_password").send_keys(ENV["INDEED_PASSWORD"])
-    @driver.find_element(id: "signin_email").send_keys(ENV["INDEED_EMAIL"])
-    sleep 4
+    binding.pry
   end
 
   def update_ages_and_sort
